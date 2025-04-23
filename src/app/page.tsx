@@ -21,17 +21,15 @@ export default function Home() {
   const callGetResponse = async () => {
     try {
       setIsLoading(true);
-      let temp = [...messages];
-      temp.push({ role: "user", content: theInput });
-      setMessages(temp);
+  
+      // Add user message
+      setMessages((prev) => [...prev, { role: "user", content: theInput }]);
       setTheInput("");
       console.log("Calling OpenAI...");
   
       const response = await fetch("/api", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages }),
       });
   
@@ -39,18 +37,12 @@ export default function Home() {
         const errorData = await response.json();
         console.error("API Error:", errorData.error);
   
-        if (response.status === 429) {
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { role: "assistant", content: "You have exceeded your OpenAI quota. Please try again later." },
-          ]);
-        } else {
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { role: "assistant", content: "Something went wrong. Please try again." },
-          ]);
-        }
+        const errorMsg =
+          response.status === 429
+            ? "You have exceeded your OpenAI quota. Please try again later."
+            : "Something went wrong. Please try again.";
   
+        setMessages((prev) => [...prev, { role: "assistant", content: errorMsg }]);
         setIsLoading(false);
         return;
       }
@@ -59,17 +51,18 @@ export default function Home() {
       const { output } = data;
       console.log("OpenAI replied...", output.content);
   
-      setMessages((prevMessages) => [...prevMessages, output]);
+      setMessages((prev) => [...prev, output]);
       setIsLoading(false);
     } catch (error) {
       console.error("Error in callGetResponse:", error);
-      setMessages((prevMessages) => [
-        ...prevMessages,
+      setMessages((prev) => [
+        ...prev,
         { role: "assistant", content: "An error occurred. Please try again." },
       ]);
       setIsLoading(false);
     }
   };
+  
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between px-24 py-5">
