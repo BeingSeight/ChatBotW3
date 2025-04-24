@@ -19,7 +19,6 @@ export default function Home() {
   ]);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
