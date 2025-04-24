@@ -65,8 +65,15 @@ export async function POST(req: Request) {
     }
   } catch (e) {
     console.error('🔥 Gemini API thrown error:', e);
+    console.log('API KEY LENGTH:', process.env.GEMINI_API_KEY?.length || 'undefined');
+    console.log('API KEY FIRST 4 CHARS:', 
+      process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.substring(0, 4) + '...' : 'undefined');
+    
+    const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+    const errorDetails = e instanceof Error ? e.toString() : String(e);
+    
     return NextResponse.json(
-      { error: 'Internal server error. Please try again later.', details: (e as Error).message },
+      { error: `Gemini API error: ${errorMessage}`, details: errorDetails },
       { status: 200 }
     );
   }
